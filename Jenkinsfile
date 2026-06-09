@@ -34,7 +34,7 @@ pipeline{
         }
         stage ('BUILD-IMAGE'){
             steps{
-                sh 'docker image build -t $IMAGE_NAME:1.0 .'
+                sh 'docker image build -t $IMAGE_NAME:$BUILD_NUMBER .'
             }
         }
         stage ('PUSH IMAGE TO GITHUB'){
