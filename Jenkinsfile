@@ -34,7 +34,7 @@ pipeline{
         }
         stage ('BUILD-IMAGE'){
             steps{
-                sh 'docker image build -t $IMAGE_NAME:$BUILD_NUMBER .'
+                sh 'docker image build -t $IMAGE_NAME:1.0 .'
             }
         }
         stage ('PUSH IMAGE TO GITHUB'){
@@ -47,7 +47,7 @@ pipeline{
                     )
                 ]) {
                     sh """ echo $PASSWORD | docker login -u $USERNAME --password-stdin """
-                    sh """ docker push $IMAGE_NAME:$BUILD_NUMBER """
+                    sh """ docker push $IMAGE_NAME:1.0 """
                         
                 }
             }
@@ -57,7 +57,7 @@ pipeline{
                 sh '''
                     docker stop health-app || true
                     docker rm health-app || true
-                    docker run -d --name health-app -p 8081:8080 $IMAGE_NAME:$BUILD_NUMBER
+                    docker run -d --name health-app -p 8081:8080 $IMAGE_NAME:1.0
                     sleep 10s
                     curl http://localhost:8081/health
                     docker container rm -f health-app
