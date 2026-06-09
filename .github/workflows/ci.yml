@@ -32,7 +32,7 @@ jobs:
         run: docker image ls
       - name: trigger jenkins
         if: success()
-        run: curl -X POST -u jenkins:11ed6bf76518d5d1881a1df8dce72d6e51 https://0eaad476c249-10-244-4-55-8080.papa.r.killercoda.com/job/pipelineA/build 
+        run: curl -X POST -u "${{ secrets.JENKINS_USERNAME }}:${{ secrets.JENKINS_TOKEN }}" "${{ secrets.JENKINS_URL }}/job/pipelineA/build" 
       
 
 
