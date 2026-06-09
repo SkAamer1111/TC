@@ -57,7 +57,7 @@ pipeline{
                 sh '''
                     docker stop health-app || true
                     docker rm health-app || true
-                    docker run -d --name health-app -p 8080:8080 $IMAGE_NAME:1.0 > deploy.log 2>&1
+                    docker run -d --name health-app -p 8081:8080 $IMAGE_NAME:1.0 > deploy.log 2>&1
                 '''
             }
         }
