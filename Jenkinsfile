@@ -2,10 +2,6 @@ pipeline{
     
     agent any
     
-    triggers {
-        githubPush()
-    }
-
     tools {
         maven 'maven3'
         jdk 'jdk17'
@@ -18,7 +14,7 @@ pipeline{
         stage ("CODE") {
         steps{
 
-            git url: 'https://github.com/SkAamer1111/java-spring-boot-project.git ', branch: 'main'            
+            git url: 'https://github.com/SkAamer1111/TC.git ', branch: 'main'            
             }
         }
         stage ('CODE BUILD'){
@@ -56,9 +52,30 @@ pipeline{
                 }
             }
         }
-        stage ('DEPLOY-APP'){
+        stage('Deploy') {
             steps {
-                sh 'docker container run -d --name deploy -P $IMAGE_NAME:1.0'
+                sh '''
+                    docker stop health-app || true
+                    docker rm health-app || true
+                    docker run -d --name health-app -p 8080:8080 $IMAGE_NAME:1.0 > deploy.log 2>&1
+                '''
+            }
+        }
+
+        stage('Upload Logs To S3') {
+            steps {
+                withCredentials([
+                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh '''
+                        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+                        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+                        aws configure set region ap-southeast-2
+
+                        aws s3 cp deploy.log s3://deployment-tc-logs/deploy-$BUILD_NUMBER.log
+                    '''
+                }
             }
         }
     }
