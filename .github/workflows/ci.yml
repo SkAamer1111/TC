@@ -1,0 +1,37 @@
+name: Auto_deployment_using_github_action
+
+on:
+  push:
+    branches: 
+      - main
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+      - name: install java 
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: install maven
+        run:  sudo apt update && sudo apt install maven -y
+      - name: enable docker service
+        run: sudo systemctl enable docker 
+      - name: start docker service
+        run: sudo systemctl start docker 
+      - name: add ubuntu user to docker group
+        run: sudo usermod -aG docker ubuntu
+      - name: checkout code
+        uses: actions/checkout@v4
+      - name: code build 
+        run: mvn clean package
+      - name: execute test cases
+        run: mvn test
+      - name: create docker image
+        run: docker image build -t shaikhaamer/test.1.0 .
+      - name: validate image
+        run: docker image ls
+      
+
+
