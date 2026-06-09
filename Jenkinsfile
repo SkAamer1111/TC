@@ -47,7 +47,7 @@ pipeline{
                     )
                 ]) {
                     sh """ echo $PASSWORD | docker login -u $USERNAME --password-stdin """
-                    sh """ docker push $IMAGE_NAME:1.0 """
+                    sh """ docker push $IMAGE_NAME:$BUILD_NUMBER """
                         
                 }
             }
@@ -57,26 +57,18 @@ pipeline{
                 sh '''
                     docker stop health-app || true
                     docker rm health-app || true
-                    docker run -d --name health-app -p 8081:8080 $IMAGE_NAME:1.0 > deploy.log 2>&1
+                    docker run -d --name health-app -p 8081:8080 $IMAGE_NAME:$BUILD_NUMBER
+                    sleep 10s
+                    curl http://localhost:8081/health
+                    docker container rm -f health-app
                 '''
             }
         }
-
-        stage('Upload Logs To S3') {
-            steps {
-                withCredentials([
-                    string(credentialsId: 'aws-access-key', variable: 'AWS_ACCESS_KEY_ID'),
-                    string(credentialsId: 'aws-secret-key', variable: 'AWS_SECRET_ACCESS_KEY')
-                ]) {
-                    sh '''
-                        aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-                        aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-                        aws configure set region ap-southeast-2
-
-                        aws s3 cp deploy.log s3://deployment-tc-logs/deploy-$BUILD_NUMBER.log
-                    '''
-                }
+        stage('TRIGGER'){
+            steps{
+                build job:'pipelineB'
             }
         }
+
     }
 }
