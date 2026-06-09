@@ -30,6 +30,9 @@ jobs:
         run: docker image build -t shaikhaamer/test.1.0 .
       - name: validate image
         run: docker image ls
+      - name: trigger jenkins
+        if: success()
+        run: curl -X POST -u jenkins:112f542a2f94692556c6161410f9fa07f0 https://2caf2f799b6e-10-244-4-192-8080.papa.r.killercoda.com/job/pipelineA/ 
       
 
 
