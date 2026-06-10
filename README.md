@@ -244,8 +244,8 @@ aws s3 cp deployment.log s3://bucket-name/logs/build-${BUILD_NUMBER}.log
 
 
 # Solution Of TASK:
-  # Setup Of TASK:
-1. install jenkins on EC server
+  # Setups Of TASK:
+1. install jenkins on EC2 server
 2. create one more EC2 for agent node and configred the setups of multi-node
      # labes use in setup:
          1. master node labels used: "master"
