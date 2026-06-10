@@ -241,3 +241,32 @@ Upload deployment log to S3:
 ```bash
 aws s3 cp deployment.log s3://bucket-name/logs/build-${BUILD_NUMBER}.log
 ```
+
+
+# Solution Of TASK:
+  # Setup Of TASK:
+1. install jenkins on EC server
+2. create one more EC2 for agent node and configred the setups of multi-node
+     # labes use in setup:
+         1. master node labels used: "master"
+         2. worker node labels used: "node"
+4. wherever we deploying the code, java-17 is to be installed on that server
+5. install docker on each server user "sudo apt update && sudo apt installe docker.io -y"
+6. aws cli is to be installed on each server (mainly on deployment server becasue from there logs pushing to s3 using aws cli command)
+7. setup maven from jenkins --> manage jenkins --> tools--->maven --> use name "maven3" ---> click on auto install
+8. setup java from jenkins --> manage jenkins --> tools --> jdk --> use name "jdk17" ---> paste this path "/usr/lib/jvm/java-17-openjdk-amd64"
+9. create s3 buket in sydney "ap-southeast-2" with name "deployment-tc-logs"
+10. create Two jobs in jenkins with name (from github actions workflow triggering ---> pipelineA ---> and pipelineA triggering---> pipelineB )
+        1. piplineA
+        2. pipelineB
+
+ # credential setup Of TASK for jenkins:
+ 1. Store docker hub credential details in jenkins credential-plugins andd use credential-id: docker-token,  to push docker image to docker hub 
+ 2. Store Access_key and Private_key in crdential-plugin and use credentialsId: aws-access-key, credentialsId: aws-secret-key, to push logs to s3 buket
+ 3. generete jenkins token , click on profile --> security ---> API Token ---> Add new Token ---> paste jenkins token ---> click on generet
+
+# credential setup Of TASK for github:
+All these data is used to trigger jenkins from github Actions workflows.... 
+ 1. add jenkins url with name JENKINS_URL in github secertes
+ 2. add jenkins username with name JENKINS_USERNAME in github secertes
+ 3. add jenkins API Token with name JENKINS_TOKEN in github secertes
